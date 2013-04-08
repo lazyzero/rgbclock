@@ -10,8 +10,8 @@
 RTC_DS1307 RTC;
 
 // Sometimes chipsets wire in a backwards sort of way
-//struct CRGB { unsigned char b; unsigned char r; unsigned char g; };
-struct CRGB { unsigned char r; unsigned char g; unsigned char b; };
+struct CRGB { unsigned char b; unsigned char r; unsigned char g; };
+//struct CRGB { unsigned char r; unsigned char g; unsigned char b; };
 struct CRGB *leds;
 
 // Number of RGB Pixel for FastSPI
@@ -42,12 +42,18 @@ void setup()
   Wire.begin();
   RTC.begin();
   
+  //Serial.begin(9600);
+  
+  if (!RTC.isrunning()) {
+    //Serial.println("RTC is NOT running!");
+    // following line sets the RTC to the date & time this sketch was compiled
+    RTC.adjust(DateTime(__DATE__, __TIME__));
+  }
+  
   // setup measurement for LDR
   digitalWrite(A0, HIGH);  // set pullup on analog pin 0 
   pinMode(A1, OUTPUT);
-  digitalWrite(A1, LOW);    
-  
-  //Serial.begin(9600);
+  digitalWrite(A1, LOW);
 }
 
 unsigned int ldr=0;
@@ -62,11 +68,10 @@ void doLDR() {
   light_level = (1023-ldr)>>6;
   if (light_level >= 15) light_level = 15;
   if (light_level <= 1) light_level = 1;
-
-  //level=2;  
+  
   level = light_level;
   //Serial.println(light_level);
-
+  //level=2;  
 }
 
 DateTime old;
